@@ -1,25 +1,23 @@
 const assert = require("assert");
 const ganache = require("ganache-cli");
 const Web3 = require("web3");
-
+const { interface, bytecode } = require("../compile");
 const web3 = new Web3(ganache.provider());
 
-class Car {
-  park() {
-    return "parking";
-  }
-  drive() {
-    return "driving";
-  }
-}
+let accounts, inbox;
 
-describe("testing Car class", () => {
-  it("should park the Car", () => {
-    const car = new Car();
-    assert.equal(car.park(), "parking");
-  });
-  it("should drive the Car", () => {
-    const car = new Car();
-    assert.equal(car.drive(), "driving");
+beforeEach(async () => {
+  accounts = await web3.eth.getAccounts();
+  inbox = await new web3.eth.Contract(JSON.parse(interface))
+    .deploy({
+      data: bytecode,
+      arguments: ["hi there!"]
+    })
+    .send({ from: accounts[0], gas: "1000000" });
+});
+
+describe("Inbox", () => {
+  it("deploys a contract", () => {
+    console.log(inbox);
   });
 });
